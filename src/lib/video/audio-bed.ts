@@ -88,6 +88,9 @@ export const DEFAULT_AUDIO_MIX: AudioMixSettings = {
   duckAmount: 0.75,
 };
 
+/** FFmpeg's `tremolo` rejects rates below 0.1 Hz. */
+const safeTremolo = (hz: number) => Math.max(hz, 0.1).toFixed(3);
+
 const clamp = (value: number | undefined, min: number, max: number) =>
   typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : min;
 
@@ -177,7 +180,7 @@ export function buildAudioBed(options: {
       [
         `[chord]highpass=f=${recipe.highpassHz}`,
         `lowpass=f=${recipe.lowpassHz}`,
-        `tremolo=f=${recipe.pulseHz}:d=${recipe.pulseDepth}`,
+        `tremolo=f=${safeTremolo(recipe.pulseHz)}:d=${recipe.pulseDepth}`,
         `aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo`,
         `volume=${settings.musicVolume.toFixed(3)}`,
         `afade=t=in:st=0:d=2`,
@@ -201,7 +204,7 @@ export function buildAudioBed(options: {
       [
         `[${nextInput}:a]highpass=f=${recipe.highpassHz}`,
         `lowpass=f=${recipe.lowpassHz}`,
-        `tremolo=f=${recipe.swellHz}:d=${recipe.swellDepth}`,
+        `tremolo=f=${safeTremolo(recipe.swellHz)}:d=${recipe.swellDepth}`,
         `aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo`,
         `volume=${settings.ambienceVolume.toFixed(3)}`,
         `afade=t=in:st=0:d=1.5`,
