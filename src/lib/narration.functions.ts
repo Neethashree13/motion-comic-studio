@@ -54,6 +54,8 @@ export const generateSceneNarration = createServerFn({ method: "POST" })
         sceneId: z.string(),
         voice: z.string().optional(),
         regenerate: z.boolean().optional(),
+        /** Optional narration style override (sci-fi, horror, action, fantasy, drama). */
+        style: z.string().optional(),
       })
       .parse(input),
   )
