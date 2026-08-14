@@ -254,7 +254,57 @@ export async function renderTimeline(
 
     const bytes = new Uint8Array(await readFile(outputPath));
     const measured = await probeDurationMs(outputPath);
-    return { bytes, durationMs: measured ?? totalMs };
+    const durationMs = measured ?? totalMs;
+
+    // Phase 8 — sound design. A separate, final pass: the scene rendering and
+    // concat above are untouched, so disabling audio layers reproduces the
+    // original output byte-for-byte.
+    const mix = normaliseAudioMix(options.audio);
+    const bed = buildAudioBed({
+      genre: resolveAudioGenre(options.genre),
+      durationSeconds: durationMs / 1000,
+      settings: mix,
+    });
+    if (!bed) return { bytes, durationMs };
+
+    await onProgress?.({ done: entries.length, total: entries.length, label: `Scoring audio — ${bed.description}` });
+
+    const mixedPath = path.join(workDir, "final-mixed.mp4");
+    try {
+      await ffmpeg([
+        "-y",
+        "-i",
+        outputPath,
+        ...bed.inputs,
+        "-filter_complex",
+        bed.filter,
+        "-map",
+        "0:v",
+        "-map",
+        bed.outputLabel,
+        "-c:v",
+        "copy",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "192k",
+        "-ar",
+        "44100",
+        "-ac",
+        "2",
+        "-shortest",
+        "-movflags",
+        "+faststart",
+        mixedPath,
+      ]);
+    } catch (error) {
+      // Never lose a finished render over the score: fall back to narration-only.
+      console.error("[video] audio mix failed, keeping narration-only track", error);
+      return { bytes, durationMs };
+    }
+
+    const mixedBytes = new Uint8Array(await readFile(mixedPath));
+    return { bytes: mixedBytes, durationMs: (await probeDurationMs(mixedPath)) ?? durationMs };
   } finally {
     await rm(workDir, { recursive: true, force: true }).catch(() => {});
   }
