@@ -4,6 +4,13 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import type { VideoTimelineEntry } from "./timeline.server";
 import { buildCameraFilter, pickCameraMove, type CameraMove } from "./camera";
+import {
+  buildAudioBed,
+  DEFAULT_AUDIO_MIX,
+  normaliseAudioMix,
+  resolveAudioGenre,
+  type AudioMixSettings,
+} from "./audio-bed";
 
 /**
  * Phase C renderer — turns a scene timeline into a single MP4 with FFmpeg.
@@ -25,6 +32,10 @@ export type RenderOptions = {
   fadeSeconds: number;
   /** Phase 1: Ken Burns camera motion on every scene. */
   motion?: boolean;
+  /** Phase 8: layered sound design. Narration always stays the primary track. */
+  audio?: AudioMixSettings;
+  /** Project genre — picks the music bed and ambience. */
+  genre?: string | null;
 };
 
 export const DEFAULT_RENDER_OPTIONS: RenderOptions = {
@@ -33,6 +44,8 @@ export const DEFAULT_RENDER_OPTIONS: RenderOptions = {
   fps: 24,
   fadeSeconds: 0.4,
   motion: true,
+  audio: DEFAULT_AUDIO_MIX,
+  genre: null,
 };
 
 export type RenderProgress = (payload: { done: number; total: number; label: string }) => void | Promise<void>;
