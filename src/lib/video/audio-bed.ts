@@ -91,7 +91,9 @@ export const DEFAULT_AUDIO_MIX: AudioMixSettings = {
 const clamp = (value: number, min: number, max: number) =>
   Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : min;
 
-export function normaliseAudioMix(input?: Partial<AudioMixSettings> | null): AudioMixSettings {
+export type AudioMixInput = { [K in keyof AudioMixSettings]?: AudioMixSettings[K] | undefined };
+
+export function normaliseAudioMix(input?: AudioMixInput | null): AudioMixSettings {
   const merged = { ...DEFAULT_AUDIO_MIX, ...(input ?? {}) };
   return {
     music: merged.music !== false,
