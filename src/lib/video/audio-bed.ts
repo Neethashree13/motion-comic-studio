@@ -89,7 +89,7 @@ export const DEFAULT_AUDIO_MIX: AudioMixSettings = {
 };
 
 const clamp = (value: number | undefined, min: number, max: number) =>
-  Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : min;
+  typeof value === "number" && Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : min;
 
 export type AudioMixInput = { [K in keyof AudioMixSettings]?: AudioMixSettings[K] | undefined };
 
