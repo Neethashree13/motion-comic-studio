@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -5,6 +6,7 @@ import {
   generateProjectVideo,
   getProjectVideo,
 } from "@/lib/video.functions";
+import { DEFAULT_AUDIO_MIX, type AudioMixSettings } from "@/lib/video/audio-bed";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "border-border text-muted-foreground",
@@ -25,11 +27,51 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+/** Phase 8 — one labelled slider for a mix layer. */
+function MixSlider({
+  label,
+  hint,
+  value,
+  disabled,
+  onChange,
+  max = 1,
+}: {
+  label: string;
+  hint: string;
+  value: number;
+  disabled?: boolean;
+  onChange: (value: number) => void;
+  max?: number;
+}) {
+  return (
+    <label className={`block ${disabled ? "opacity-40" : ""}`}>
+      <span className="flex items-baseline justify-between text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+        {label}
+        <span className="text-primary">{Math.round((value / max) * 100)}%</span>
+      </span>
+      <input
+        type="range"
+        min={0}
+        max={max}
+        step={0.01}
+        value={value}
+        disabled={disabled}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="mt-2 w-full accent-primary"
+      />
+      <span className="mt-1 block text-[11px] text-muted-foreground">{hint}</span>
+    </label>
+  );
+}
+
 export function VideoStudio({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient();
   const load = useServerFn(getProjectVideo);
   const render = useServerFn(generateProjectVideo);
   const drop = useServerFn(deleteProjectVideo);
+  const [audio, setAudio] = useState<AudioMixSettings>(DEFAULT_AUDIO_MIX);
+  const patchAudio = (patch: Partial<AudioMixSettings>) =>
+    setAudio((current) => ({ ...current, ...patch }));
 
   const videoQuery = useQuery({
     queryKey: ["project-video", projectId],
@@ -40,7 +82,7 @@ export function VideoStudio({ projectId }: { projectId: string }) {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["project-video", projectId] });
 
   const renderMutation = useMutation({
-    mutationFn: () => render({ data: { projectId } }),
+    mutationFn: () => render({ data: { projectId, audio } }),
     onSettled: refresh,
   });
   const deleteMutation = useMutation({
@@ -100,6 +142,72 @@ export function VideoStudio({ projectId }: { projectId: string }) {
           Generate an image and narration for at least one scene to unlock video rendering.
         </p>
       ) : null}
+
+      {/* Phase 8 — audio layers. Narration is always the primary track; music and
+          ambience sit under it and duck automatically while a line is spoken. */}
+      <div className="mt-6 rounded-sm border border-border p-5">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 className="font-display text-lg tracking-wider">Audio layers</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              A score and ambience matched to this project's genre, mixed under the narration.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-4 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={audio.music}
+                onChange={(event) => patchAudio({ music: event.target.checked })}
+                className="accent-primary"
+              />
+              Music
+            </label>
+            <label className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={audio.ambience}
+                onChange={(event) => patchAudio({ ambience: event.target.checked })}
+                className="accent-primary"
+              />
+              Ambience
+            </label>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          <MixSlider
+            label="Narration"
+            hint="Primary track — never ducked."
+            value={audio.narrationVolume}
+            max={2}
+            onChange={(narrationVolume) => patchAudio({ narrationVolume })}
+          />
+          <MixSlider
+            label="Music"
+            hint="Genre score under the voice."
+            value={audio.musicVolume}
+            disabled={!audio.music}
+            onChange={(musicVolume) => patchAudio({ musicVolume })}
+          />
+          <MixSlider
+            label="Ambience"
+            hint="Room tone and atmosphere."
+            value={audio.ambienceVolume}
+            disabled={!audio.ambience}
+            onChange={(ambienceVolume) => patchAudio({ ambienceVolume })}
+          />
+          <MixSlider
+            label="Duck under voice"
+            hint="How far the beds dip while narration plays."
+            value={audio.duckAmount}
+            onChange={(duckAmount) => patchAudio({ duckAmount })}
+          />
+        </div>
+        <p className="mt-4 text-[11px] text-muted-foreground">
+          Changes apply the next time you render.
+        </p>
+      </div>
 
       {state && state.issues.length > 0 ? (
         <ul className="mt-5 space-y-1 text-xs text-muted-foreground">
