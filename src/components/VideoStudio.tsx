@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -5,6 +6,7 @@ import {
   generateProjectVideo,
   getProjectVideo,
 } from "@/lib/video.functions";
+import { DEFAULT_AUDIO_MIX, type AudioMixSettings } from "@/lib/video/audio-bed";
 
 const STATUS_STYLES: Record<string, string> = {
   pending: "border-border text-muted-foreground",
@@ -25,11 +27,51 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+/** Phase 8 — one labelled slider for a mix layer. */
+function MixSlider({
+  label,
+  hint,
+  value,
+  disabled,
+  onChange,
+  max = 1,
+}: {
+  label: string;
+  hint: string;
+  value: number;
+  disabled?: boolean;
+  onChange: (value: number) => void;
+  max?: number;
+}) {
+  return (
+    <label className={`block ${disabled ? "opacity-40" : ""}`}>
+      <span className="flex items-baseline justify-between text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+        {label}
+        <span className="text-primary">{Math.round((value / max) * 100)}%</span>
+      </span>
+      <input
+        type="range"
+        min={0}
+        max={max}
+        step={0.01}
+        value={value}
+        disabled={disabled}
+        onChange={(event) => onChange(Number(event.target.value))}
+        className="mt-2 w-full accent-primary"
+      />
+      <span className="mt-1 block text-[11px] text-muted-foreground">{hint}</span>
+    </label>
+  );
+}
+
 export function VideoStudio({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient();
   const load = useServerFn(getProjectVideo);
   const render = useServerFn(generateProjectVideo);
   const drop = useServerFn(deleteProjectVideo);
+  const [audio, setAudio] = useState<AudioMixSettings>(DEFAULT_AUDIO_MIX);
+  const patchAudio = (patch: Partial<AudioMixSettings>) =>
+    setAudio((current) => ({ ...current, ...patch }));
 
   const videoQuery = useQuery({
     queryKey: ["project-video", projectId],
@@ -40,7 +82,7 @@ export function VideoStudio({ projectId }: { projectId: string }) {
   const refresh = () => queryClient.invalidateQueries({ queryKey: ["project-video", projectId] });
 
   const renderMutation = useMutation({
-    mutationFn: () => render({ data: { projectId } }),
+    mutationFn: () => render({ data: { projectId, audio } }),
     onSettled: refresh,
   });
   const deleteMutation = useMutation({
