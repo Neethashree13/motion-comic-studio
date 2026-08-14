@@ -78,12 +78,31 @@ export const getProjectVideo = createServerFn({ method: "POST" })
   });
 
 export const generateProjectVideo = createServerFn({ method: "POST" })
-  .validator((input: unknown) => z.object({ projectId: z.string() }).parse(input))
+  .validator((input: unknown) =>
+    z
+      .object({
+        projectId: z.string(),
+        // Phase 8 — optional audio layers. Omitted means "use the defaults",
+        // so every existing caller keeps working unchanged.
+        audio: z
+          .object({
+            music: z.boolean().optional(),
+            ambience: z.boolean().optional(),
+            narrationVolume: z.number().optional(),
+            musicVolume: z.number().optional(),
+            ambienceVolume: z.number().optional(),
+            duckAmount: z.number().optional(),
+          })
+          .optional(),
+      })
+      .parse(input),
+  )
   .handler(async ({ data }): Promise<VideoRenderRecord> => {
     const { getDb } = await import("./db.server");
     const { getObject, objectUrl, putObject } = await import("./storage.server");
     const { buildProjectTimeline, videoKey } = await import("./video/timeline.server");
-    const { renderTimeline } = await import("./video/render.server");
+    const { renderTimeline, DEFAULT_RENDER_OPTIONS } = await import("./video/render.server");
+    const { normaliseAudioMix } = await import("./video/audio-bed");
     const db = getDb();
 
     const project = await db.project.findUnique({ where: { id: data.projectId } });
@@ -117,11 +136,20 @@ export const generateProjectVideo = createServerFn({ method: "POST" })
         );
       }
 
-      const result = await renderTimeline(entries, getObject, async ({ done, total }) => {
-        // Rendering is 90% of the job; upload/finalise is the last 10%.
-        const progress = Math.round((done / total) * 90);
-        await db.videoRender.update({ where: { id: row.id }, data: { progress } });
-      });
+      const result = await renderTimeline(
+        entries,
+        getObject,
+        async ({ done, total }) => {
+          // Rendering is 90% of the job; upload/finalise is the last 10%.
+          const progress = Math.round((done / total) * 90);
+          await db.videoRender.update({ where: { id: row.id }, data: { progress } });
+        },
+        {
+          ...DEFAULT_RENDER_OPTIONS,
+          audio: normaliseAudioMix(data.audio),
+          genre: project.genre ?? null,
+        },
+      );
 
       const key = videoKey(data.projectId);
       await putObject(key, result.bytes);
