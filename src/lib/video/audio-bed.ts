@@ -88,7 +88,7 @@ export const DEFAULT_AUDIO_MIX: AudioMixSettings = {
   duckAmount: 0.75,
 };
 
-const clamp = (value: number, min: number, max: number) =>
+const clamp = (value: number | undefined, min: number, max: number) =>
   Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : min;
 
 export type AudioMixInput = { [K in keyof AudioMixSettings]?: AudioMixSettings[K] | undefined };
