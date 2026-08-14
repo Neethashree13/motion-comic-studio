@@ -54,6 +54,8 @@ export const generateSceneNarration = createServerFn({ method: "POST" })
         sceneId: z.string(),
         voice: z.string().optional(),
         regenerate: z.boolean().optional(),
+        /** Optional narration style override (sci-fi, horror, action, fantasy, drama). */
+        style: z.string().optional(),
       })
       .parse(input),
   )
@@ -61,14 +63,29 @@ export const generateSceneNarration = createServerFn({ method: "POST" })
     const { getDb } = await import("./db.server");
     const { objectUrl, putObject, removeObjects } = await import("./storage.server");
     const { audioKey, buildNarrationText } = await import("./narration.server");
+    const { writeNarrationScript, resolveNarrationStyle } = await import("./narration-script.server");
     const { getTtsProvider } = await import("./tts/index.server");
     const db = getDb();
 
-    const scene = await db.scene.findUnique({ where: { id: data.sceneId } });
+    const scene = await db.scene.findUnique({
+      where: { id: data.sceneId },
+      include: { project: { select: { genre: true } } },
+    });
     if (!scene) throw new Error("Scene not found.");
 
-    const narrationText = buildNarrationText(scene);
-    if (!narrationText.trim()) throw new Error("This scene has no narration text to speak.");
+    const rawNarration = buildNarrationText(scene);
+    if (!rawNarration.trim()) throw new Error("This scene has no narration text to speak.");
+
+    // Phase 3 — perform the line instead of reading it. Meaning is preserved;
+    // only pacing, pauses and suspense are added before TTS runs.
+    const style = resolveNarrationStyle(data.style ?? scene.project?.genre ?? null);
+    const { script } = await writeNarrationScript({
+      text: rawNarration,
+      style,
+      sceneTitle: scene.title,
+      dialogue: scene.dialogue,
+    });
+    const narrationText = script.trim() || rawNarration;
 
     const latest = await db.sceneAudio.findFirst({
       where: { scene_id: scene.id },
@@ -157,6 +174,32 @@ export const deleteSceneAudio = createServerFn({ method: "POST" })
   });
 
 /** Ordered image + audio pairing per scene — the input for future video assembly. */
+export const previewNarrationScript = createServerFn({ method: "POST" })
+  .validator((input: unknown) =>
+    z.object({ sceneId: z.string(), style: z.string().optional() }).parse(input),
+  )
+  .handler(async ({ data }): Promise<{ original: string; script: string; style: string }> => {
+    const { getDb } = await import("./db.server");
+    const { buildNarrationText } = await import("./narration.server");
+    const { writeNarrationScript, resolveNarrationStyle } = await import("./narration-script.server");
+
+    const scene = await getDb().scene.findUnique({
+      where: { id: data.sceneId },
+      include: { project: { select: { genre: true } } },
+    });
+    if (!scene) throw new Error("Scene not found.");
+
+    const original = buildNarrationText(scene);
+    const style = resolveNarrationStyle(data.style ?? scene.project?.genre ?? null);
+    const { script } = await writeNarrationScript({
+      text: original,
+      style,
+      sceneTitle: scene.title,
+      dialogue: scene.dialogue,
+    });
+    return { original, script: script || original, style };
+  });
+
 export const getSceneTimeline = createServerFn({ method: "POST" })
   .validator((input: unknown) => z.object({ projectId: z.string() }).parse(input))
   .handler(async ({ data }) => {

@@ -76,28 +76,28 @@ export function SceneAudioPlayer({
         <p className="text-xs text-destructive">{audio.error_message}</p>
       ) : null}
 
-      {!compact ? (
-        <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] uppercase tracking-[0.2em]">
+      {/* Regenerate stays available in compact cards too, so a flat take can
+          always be re-performed with the new narration scripting. */}
+      <div className="flex flex-wrap gap-x-4 gap-y-2 text-[10px] uppercase tracking-[0.2em]">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void handlePlay()}
+          className="text-primary disabled:opacity-40"
+        >
+          {busy ? "Narrating…" : compact && ready ? "Replay" : "Play narration"}
+        </button>
+        {audio ? (
           <button
             type="button"
             disabled={busy}
-            onClick={() => void handlePlay()}
-            className="text-primary disabled:opacity-40"
+            onClick={() => void onRegenerate()}
+            className="text-muted-foreground hover:text-primary disabled:opacity-40"
           >
-            {busy ? "Narrating…" : "Play narration"}
+            Regenerate narration
           </button>
-          {audio ? (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => void onRegenerate()}
-              className="text-muted-foreground hover:text-primary disabled:opacity-40"
-            >
-              Regenerate narration
-            </button>
-          ) : null}
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </div>
   );
 }

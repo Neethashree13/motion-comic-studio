@@ -8,7 +8,8 @@ export interface PanelRecord {
   scene_id: string;
   project_id: string;
   error_message?: string | null;
-  created_at?: string;
+  created_at?: string | Date;
+  updated_at?: string | Date;
 }
 
 export interface SceneRecord {
