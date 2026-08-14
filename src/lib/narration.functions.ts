@@ -61,14 +61,29 @@ export const generateSceneNarration = createServerFn({ method: "POST" })
     const { getDb } = await import("./db.server");
     const { objectUrl, putObject, removeObjects } = await import("./storage.server");
     const { audioKey, buildNarrationText } = await import("./narration.server");
+    const { writeNarrationScript, resolveNarrationStyle } = await import("./narration-script.server");
     const { getTtsProvider } = await import("./tts/index.server");
     const db = getDb();
 
-    const scene = await db.scene.findUnique({ where: { id: data.sceneId } });
+    const scene = await db.scene.findUnique({
+      where: { id: data.sceneId },
+      include: { project: { select: { genre: true } } },
+    });
     if (!scene) throw new Error("Scene not found.");
 
-    const narrationText = buildNarrationText(scene);
-    if (!narrationText.trim()) throw new Error("This scene has no narration text to speak.");
+    const rawNarration = buildNarrationText(scene);
+    if (!rawNarration.trim()) throw new Error("This scene has no narration text to speak.");
+
+    // Phase 3 — perform the line instead of reading it. Meaning is preserved;
+    // only pacing, pauses and suspense are added before TTS runs.
+    const style = resolveNarrationStyle(data.style ?? scene.project?.genre ?? null);
+    const { script } = await writeNarrationScript({
+      text: rawNarration,
+      style,
+      sceneTitle: scene.title,
+      dialogue: scene.dialogue,
+    });
+    const narrationText = script.trim() || rawNarration;
 
     const latest = await db.sceneAudio.findFirst({
       where: { scene_id: scene.id },
