@@ -174,6 +174,32 @@ export const deleteSceneAudio = createServerFn({ method: "POST" })
   });
 
 /** Ordered image + audio pairing per scene — the input for future video assembly. */
+export const previewNarrationScript = createServerFn({ method: "POST" })
+  .validator((input: unknown) =>
+    z.object({ sceneId: z.string(), style: z.string().optional() }).parse(input),
+  )
+  .handler(async ({ data }): Promise<{ original: string; script: string; style: string }> => {
+    const { getDb } = await import("./db.server");
+    const { buildNarrationText } = await import("./narration.server");
+    const { writeNarrationScript, resolveNarrationStyle } = await import("./narration-script.server");
+
+    const scene = await getDb().scene.findUnique({
+      where: { id: data.sceneId },
+      include: { project: { select: { genre: true } } },
+    });
+    if (!scene) throw new Error("Scene not found.");
+
+    const original = buildNarrationText(scene);
+    const style = resolveNarrationStyle(data.style ?? scene.project?.genre ?? null);
+    const { script } = await writeNarrationScript({
+      text: original,
+      style,
+      sceneTitle: scene.title,
+      dialogue: scene.dialogue,
+    });
+    return { original, script: script || original, style };
+  });
+
 export const getSceneTimeline = createServerFn({ method: "POST" })
   .validator((input: unknown) => z.object({ projectId: z.string() }).parse(input))
   .handler(async ({ data }) => {
