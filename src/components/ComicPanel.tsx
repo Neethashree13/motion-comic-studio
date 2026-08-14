@@ -82,6 +82,7 @@
 
 import { useState } from "react";
 import type { PanelRecord } from "../types";
+export type { PanelRecord };
 import { objectUrl } from "../utils/url";
 import { RefreshCw, Eye, EyeOff, AlertTriangle, Image as ImageIcon } from "lucide-react";
 
