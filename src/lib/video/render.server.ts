@@ -3,6 +3,7 @@ import { mkdtemp, rm, writeFile, readFile, mkdir } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import type { VideoTimelineEntry } from "./timeline.server";
+import { buildCameraFilter, pickCameraMove, type CameraMove } from "./camera";
 
 /**
  * Phase C renderer — turns a scene timeline into a single MP4 with FFmpeg.
@@ -22,6 +23,8 @@ export type RenderOptions = {
   fps: number;
   /** Cross-scene fade length in seconds. */
   fadeSeconds: number;
+  /** Phase 1: Ken Burns camera motion on every scene. */
+  motion?: boolean;
 };
 
 export const DEFAULT_RENDER_OPTIONS: RenderOptions = {
@@ -29,6 +32,7 @@ export const DEFAULT_RENDER_OPTIONS: RenderOptions = {
   height: 720,
   fps: 24,
   fadeSeconds: 0.4,
+  motion: true,
 };
 
 export type RenderProgress = (payload: { done: number; total: number; label: string }) => void | Promise<void>;
@@ -140,6 +144,26 @@ export async function renderTimeline(
       const fade = Math.min(options.fadeSeconds, seconds / 3);
       const fadeOutStart = Math.max(seconds - fade, 0).toFixed(3);
 
+      // Phase 1 — each scene gets a deterministic cinematic move whose pacing
+      // matches its narration length. Falls back to the old static framing
+      // when motion is disabled.
+      const move: CameraMove = pickCameraMove(entry.sceneId || String(entry.sceneNumber), index);
+      const framing =
+        options.motion === false
+          ? [
+              `scale=${options.width}:${options.height}:force_original_aspect_ratio=decrease`,
+              `pad=${options.width}:${options.height}:(ow-iw)/2:(oh-ih)/2:color=black`,
+              "setsar=1",
+              `fps=${options.fps}`,
+            ].join(",")
+          : buildCameraFilter({
+              width: options.width,
+              height: options.height,
+              fps: options.fps,
+              durationSeconds: seconds,
+              move,
+            });
+
       const segmentPath = path.join(segmentsDir, `segment-${String(index).padStart(3, "0")}.mp4`);
       await ffmpeg([
         "-y",
@@ -151,10 +175,7 @@ export async function renderTimeline(
         audioPath,
         "-filter_complex",
         [
-          `[0:v]scale=${options.width}:${options.height}:force_original_aspect_ratio=decrease`,
-          `pad=${options.width}:${options.height}:(ow-iw)/2:(oh-ih)/2:color=black`,
-          "setsar=1",
-          `fps=${options.fps}`,
+          `[0:v]${framing}`,
           `fade=t=in:st=0:d=${fade.toFixed(3)}`,
           `fade=t=out:st=${fadeOutStart}:d=${fade.toFixed(3)}[v]`,
         ].join(","),
@@ -187,7 +208,7 @@ export async function renderTimeline(
       await onProgress?.({
         done: index + 1,
         total: entries.length,
-        label: `Rendered scene ${entry.sceneNumber}`,
+        label: `Rendered scene ${entry.sceneNumber} (${move.replace("_", " ")})`,
       });
     }
 
