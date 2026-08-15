@@ -148,19 +148,37 @@ export function buildAudioBed(options: {
   let nextInput = 1;
 
   // Narration: primary layer, split into the audible take plus one key per duck.
-  const keysNeeded = (wantsMusic ? 1 : 0) + (wantsAmbience ? 1 : 0);
+  // Only allocate keys when ducking is actually enabled — an unconsumed asplit
+  // output makes FFmpeg fail with "Filter 'asplit' has output N unconnected".
+  const ducking = settings.duckAmount > 0;
+  const keysNeeded = ducking ? (wantsMusic ? 1 : 0) + (wantsAmbience ? 1 : 0) : 0;
   const keyLabels = Array.from({ length: keysNeeded }, (_, i) => `key${i}`);
   chains.push(
-    `[0:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,volume=${settings.narrationVolume.toFixed(3)}[narr]`,
+    `[0:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo[narrsrc]`,
   );
-  chains.push(`[narr]asplit=${keysNeeded + 1}[narrout]${keyLabels.map((l) => `[${l}]`).join("")}`);
+  if (keysNeeded > 0) {
+    // The key is taken *before* the narration volume trim, so the duck depth is
+    // independent of how loud the user set the voice.
+    chains.push(`[narrsrc]asplit=${keysNeeded + 1}[narrlvl]${keyLabels.map((l) => `[${l}raw]`).join("")}`);
+    chains.push(`[narrlvl]volume=${settings.narrationVolume.toFixed(3)}[narrout]`);
+    // Band-limit to the speech range and hard-boost so the key reliably crosses
+    // the compressor threshold at ordinary narration levels.
+    for (const label of keyLabels) {
+      chains.push(
+        `[${label}raw]highpass=f=150,lowpass=f=4000,volume=12,alimiter=limit=0.99[${label}]`,
+      );
+    }
+  } else {
+    chains.push(`[narrsrc]volume=${settings.narrationVolume.toFixed(3)}[narrout]`);
+  }
   mixLabels.push("[narrout]");
 
-  // Ducking strength: a deeper threshold + ratio the higher duckAmount is.
-  const ratio = (2 + settings.duckAmount * 14).toFixed(2);
-  const threshold = (0.09 - settings.duckAmount * 0.08).toFixed(4);
+  // Ducking strength: with a hot key, a low threshold plus a steep ratio gives a
+  // clearly audible dip. duckAmount 1 ≈ 12+ dB of gain reduction under speech.
+  const ratio = (1.5 + settings.duckAmount * 18.5).toFixed(2);
+  const threshold = Math.max(0.3 - settings.duckAmount * 0.29, 0.01).toFixed(4);
   const duck = (source: string, key: string, out: string, release: number) =>
-    `[${source}][${key}]sidechaincompress=threshold=${threshold}:ratio=${ratio}:attack=15:release=${release}:makeup=1[${out}]`;
+    `[${source}][${key}]sidechaincompress=threshold=${threshold}:ratio=${ratio}:attack=15:release=${release}:makeup=1:level_sc=1[${out}]`;
 
   let keyIndex = 0;
 
@@ -187,7 +205,7 @@ export function buildAudioBed(options: {
         `afade=t=out:st=${fadeOut}:d=2.5[musicraw]`,
       ].join(","),
     );
-    if (settings.duckAmount > 0) {
+    if (ducking) {
       chains.push(duck("musicraw", keyLabels[keyIndex]!, "musicmix", 420));
       keyIndex += 1;
     } else {
@@ -212,7 +230,7 @@ export function buildAudioBed(options: {
       ].join(","),
     );
     nextInput += 1;
-    if (settings.duckAmount > 0) {
+    if (ducking) {
       // Ambience ducks more gently than music so the world never goes silent.
       chains.push(duck("ambraw", keyLabels[keyIndex]!, "ambmix", 700));
       keyIndex += 1;
