@@ -6,7 +6,7 @@
  * and can plan a whole project offline when AI is unavailable.
  */
 
-import { pickCameraMove, type CameraMove } from "./camera";
+import { CAMERA_MOVES, pickCameraMove, type CameraMove } from "./camera";
 
 export const SHOT_TYPES = [
   "establishing",
@@ -31,7 +31,7 @@ export const SHOT_EMOTIONS = [
 export type ShotEmotion = (typeof SHOT_EMOTIONS)[number];
 
 /** Camera movement vocabulary = the renderer's moves plus a true static hold. */
-export const SHOT_CAMERA_MOVEMENTS = ["static", ...([] as string[])] as const;
+export const SHOT_CAMERA_MOVEMENTS = ["static", ...CAMERA_MOVES] as const;
 export type ShotCameraMovement = CameraMove | "static";
 
 export type ShotPlanEntry = {
@@ -56,10 +56,7 @@ export function isShotEmotion(value: unknown): value is ShotEmotion {
   return typeof value === "string" && (SHOT_EMOTIONS as readonly string[]).includes(value);
 }
 export function isCameraMovement(value: unknown): value is ShotCameraMovement {
-  return (
-    typeof value === "string" &&
-    (value === "static" || ["zoom_in", "zoom_out", "pan_left", "pan_right", "push_in"].includes(value))
-  );
+  return typeof value === "string" && (SHOT_CAMERA_MOVEMENTS as readonly string[]).includes(value);
 }
 
 export const clampShotDuration = (seconds: number) =>
