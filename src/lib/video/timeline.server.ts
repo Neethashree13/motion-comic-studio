@@ -15,6 +15,8 @@ export type VideoTimelineEntry = {
   durationMs: number | null;
   /** Phase D hook: the exact narration script for this segment. */
   narrationText: string | null;
+  /** Phase 1 (AI Director): planned camera movement, when a shot plan exists. */
+  cameraMovement?: string | null;
 };
 
 export type TimelineIssue = {
@@ -46,6 +48,8 @@ export async function buildProjectTimeline(
     }),
   ]);
   const narrationById = new Map(scenes.map((scene) => [scene.id, scene.narration]));
+  const { loadShotPlan } = await import("./shot-plan.server");
+  const shotsById = await loadShotPlan(db, projectId);
 
   const entries: VideoTimelineEntry[] = [];
   const issues: TimelineIssue[] = [];
@@ -68,6 +72,7 @@ export async function buildProjectTimeline(
       audioPath: row.audioKey,
       durationMs: row.durationMs,
       narrationText: narrationById.get(row.sceneId) ?? null,
+      cameraMovement: shotsById.get(row.sceneId)?.cameraMovement ?? null,
     });
   }
 
