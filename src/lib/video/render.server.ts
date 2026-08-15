@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import type { VideoTimelineEntry } from "./timeline.server";
 import { buildCameraFilter, pickCameraMove, type CameraMove } from "./camera";
+import { isCameraMovement } from "./shot-plan";
 import {
   buildAudioBed,
   DEFAULT_AUDIO_MIX,
@@ -160,9 +161,14 @@ export async function renderTimeline(
       // Phase 1 — each scene gets a deterministic cinematic move whose pacing
       // matches its narration length. Falls back to the old static framing
       // when motion is disabled.
-      const move: CameraMove = pickCameraMove(entry.sceneId || String(entry.sceneNumber), index);
+      // Prefer the AI director's planned move when the scene has shot metadata.
+      const planned = isCameraMovement(entry.cameraMovement) ? entry.cameraMovement : null;
+      const move: CameraMove =
+        planned && planned !== "static"
+          ? planned
+          : pickCameraMove(entry.sceneId || String(entry.sceneNumber), index);
       const framing =
-        options.motion === false
+        options.motion === false || planned === "static"
           ? [
               `scale=${options.width}:${options.height}:force_original_aspect_ratio=decrease`,
               `pad=${options.width}:${options.height}:(ow-iw)/2:(oh-ih)/2:color=black`,
