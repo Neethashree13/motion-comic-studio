@@ -82,3 +82,9 @@ export type SceneAudio = Prisma.SceneAudioModel
  * Status lifecycle: pending -> processing -> completed | failed.
  */
 export type VideoRender = Prisma.VideoRenderModel
+/**
+ * Model SceneShot
+ * Phase 1 (AI Director) — reusable shot metadata for one scene.
+ * Planned once, then read by the motion engine, transitions and video studio.
+ */
+export type SceneShot = Prisma.SceneShotModel

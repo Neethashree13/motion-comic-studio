@@ -404,7 +404,8 @@ export const ModelName = {
   GeneratedImage: 'GeneratedImage',
   CharacterReferenceImage: 'CharacterReferenceImage',
   SceneAudio: 'SceneAudio',
-  VideoRender: 'VideoRender'
+  VideoRender: 'VideoRender',
+  SceneShot: 'SceneShot'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -420,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "project" | "character" | "scene" | "panel" | "generatedImage" | "characterReferenceImage" | "sceneAudio" | "videoRender"
+    modelProps: "project" | "character" | "scene" | "panel" | "generatedImage" | "characterReferenceImage" | "sceneAudio" | "videoRender" | "sceneShot"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1016,6 +1017,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SceneShot: {
+      payload: Prisma.$SceneShotPayload<ExtArgs>
+      fields: Prisma.SceneShotFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SceneShotFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SceneShotFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload>
+        }
+        findFirst: {
+          args: Prisma.SceneShotFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SceneShotFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload>
+        }
+        findMany: {
+          args: Prisma.SceneShotFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload>[]
+        }
+        create: {
+          args: Prisma.SceneShotCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload>
+        }
+        createMany: {
+          args: Prisma.SceneShotCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SceneShotCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload>[]
+        }
+        delete: {
+          args: Prisma.SceneShotDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload>
+        }
+        update: {
+          args: Prisma.SceneShotUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload>
+        }
+        deleteMany: {
+          args: Prisma.SceneShotDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SceneShotUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SceneShotUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload>[]
+        }
+        upsert: {
+          args: Prisma.SceneShotUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SceneShotPayload>
+        }
+        aggregate: {
+          args: Prisma.SceneShotAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSceneShot>
+        }
+        groupBy: {
+          args: Prisma.SceneShotGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SceneShotGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SceneShotCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SceneShotCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1199,6 +1274,23 @@ export const VideoRenderScalarFieldEnum = {
 } as const
 
 export type VideoRenderScalarFieldEnum = (typeof VideoRenderScalarFieldEnum)[keyof typeof VideoRenderScalarFieldEnum]
+
+
+export const SceneShotScalarFieldEnum = {
+  id: 'id',
+  project_id: 'project_id',
+  scene_id: 'scene_id',
+  shot_type: 'shot_type',
+  camera_movement: 'camera_movement',
+  duration_seconds: 'duration_seconds',
+  emotion: 'emotion',
+  note: 'note',
+  source: 'source',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type SceneShotScalarFieldEnum = (typeof SceneShotScalarFieldEnum)[keyof typeof SceneShotScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1482,6 +1574,7 @@ export type GlobalOmitConfig = {
   characterReferenceImage?: Prisma.CharacterReferenceImageOmit
   sceneAudio?: Prisma.SceneAudioOmit
   videoRender?: Prisma.VideoRenderOmit
+  sceneShot?: Prisma.SceneShotOmit
 }
 
 /* Types for Logging */
