@@ -154,21 +154,22 @@ export function buildAudioBed(options: {
   const keysNeeded = ducking ? (wantsMusic ? 1 : 0) + (wantsAmbience ? 1 : 0) : 0;
   const keyLabels = Array.from({ length: keysNeeded }, (_, i) => `key${i}`);
   chains.push(
-    `[0:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo,volume=${settings.narrationVolume.toFixed(3)}[narr]`,
+    `[0:a]aformat=sample_fmts=fltp:sample_rates=44100:channel_layouts=stereo[narrsrc]`,
   );
   if (keysNeeded > 0) {
-    chains.push(
-      `[narr]asplit=${keysNeeded + 1}[narrout]${keyLabels.map((l) => `[${l}raw]`).join("")}`,
-    );
-    // The sidechain key must be hot enough to cross the compressor threshold at
-    // ordinary narration levels. Band-limit to the speech range, then hard-boost.
+    // The key is taken *before* the narration volume trim, so the duck depth is
+    // independent of how loud the user set the voice.
+    chains.push(`[narrsrc]asplit=${keysNeeded + 1}[narrlvl]${keyLabels.map((l) => `[${l}raw]`).join("")}`);
+    chains.push(`[narrlvl]volume=${settings.narrationVolume.toFixed(3)}[narrout]`);
+    // Band-limit to the speech range and hard-boost so the key reliably crosses
+    // the compressor threshold at ordinary narration levels.
     for (const label of keyLabels) {
       chains.push(
         `[${label}raw]highpass=f=150,lowpass=f=4000,volume=12,alimiter=limit=0.99[${label}]`,
       );
     }
   } else {
-    chains.push(`[narr]anull[narrout]`);
+    chains.push(`[narrsrc]volume=${settings.narrationVolume.toFixed(3)}[narrout]`);
   }
   mixLabels.push("[narrout]");
 
