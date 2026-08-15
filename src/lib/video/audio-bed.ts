@@ -175,8 +175,8 @@ export function buildAudioBed(options: {
 
   // Ducking strength: with a hot key, a low threshold plus a steep ratio gives a
   // clearly audible dip. duckAmount 1 ≈ 12+ dB of gain reduction under speech.
-  const ratio = (2 + settings.duckAmount * 18).toFixed(2);
-  const threshold = (0.02).toFixed(4);
+  const ratio = (1.5 + settings.duckAmount * 18.5).toFixed(2);
+  const threshold = Math.max(0.3 - settings.duckAmount * 0.29, 0.01).toFixed(4);
   const duck = (source: string, key: string, out: string, release: number) =>
     `[${source}][${key}]sidechaincompress=threshold=${threshold}:ratio=${ratio}:attack=15:release=${release}:makeup=1:level_sc=1[${out}]`;
 
