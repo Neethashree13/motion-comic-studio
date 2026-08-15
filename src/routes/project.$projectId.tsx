@@ -11,6 +11,7 @@ import { ComicReader } from "@/components/ComicReader";
 import { SceneImageCard, type SceneRecord } from "@/components/SceneImageCard";
 import { ImageLightbox } from "@/components/ImageLightbox";
 import { VideoStudio } from "@/components/VideoStudio";
+import { ShotPlanner } from "@/components/ShotPlanner";
 
 import type { SceneImage } from "@/components/ImageStatusBadge";
 import { generatePanels, getProject, regeneratePanel } from "@/lib/projects.functions";
@@ -526,6 +527,8 @@ function ProjectPage() {
             ))}
           </div>
         </section>
+
+        <ShotPlanner projectId={projectId} />
 
         <VideoStudio projectId={projectId} />
       </main>
