@@ -58,7 +58,8 @@ export const ModelName = {
   GeneratedImage: 'GeneratedImage',
   CharacterReferenceImage: 'CharacterReferenceImage',
   SceneAudio: 'SceneAudio',
-  VideoRender: 'VideoRender'
+  VideoRender: 'VideoRender',
+  SceneShot: 'SceneShot'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -221,6 +222,23 @@ export const VideoRenderScalarFieldEnum = {
 } as const
 
 export type VideoRenderScalarFieldEnum = (typeof VideoRenderScalarFieldEnum)[keyof typeof VideoRenderScalarFieldEnum]
+
+
+export const SceneShotScalarFieldEnum = {
+  id: 'id',
+  project_id: 'project_id',
+  scene_id: 'scene_id',
+  shot_type: 'shot_type',
+  camera_movement: 'camera_movement',
+  duration_seconds: 'duration_seconds',
+  emotion: 'emotion',
+  note: 'note',
+  source: 'source',
+  created_at: 'created_at',
+  updated_at: 'updated_at'
+} as const
+
+export type SceneShotScalarFieldEnum = (typeof SceneShotScalarFieldEnum)[keyof typeof SceneShotScalarFieldEnum]
 
 
 export const SortOrder = {

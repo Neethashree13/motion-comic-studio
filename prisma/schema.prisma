@@ -33,6 +33,7 @@ model Project {
   referenceImages CharacterReferenceImage[]
   sceneAudios     SceneAudio[]
   videoRenders    VideoRender[]
+  sceneShots      SceneShot[]
 
   @@index([updated_at(sort: Desc)])
   @@map("projects")
@@ -81,7 +82,7 @@ model Scene {
   panels          Panel[]
   generatedImages GeneratedImage[]
   sceneAudios     SceneAudio[]
-
+  shot            SceneShot?
 
   @@index([project_id, scene_number])
   @@map("scenes")
@@ -190,4 +191,26 @@ model VideoRender {
 
   @@index([project_id, created_at(sort: Desc)])
   @@map("video_renders")
+}
+
+/// Phase 1 (AI Director) — reusable shot metadata for one scene.
+/// Planned once, then read by the motion engine, transitions and video studio.
+model SceneShot {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  project_id       String   @db.Uuid
+  scene_id         String   @unique @db.Uuid
+  shot_type        String
+  camera_movement  String
+  duration_seconds Float
+  emotion          String
+  note             String?
+  source           String   @default("ai")
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @updatedAt @db.Timestamptz(6)
+
+  project Project @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  scene   Scene   @relation(fields: [scene_id], references: [id], onDelete: Cascade)
+
+  @@index([project_id])
+  @@map("scene_shots")
 }

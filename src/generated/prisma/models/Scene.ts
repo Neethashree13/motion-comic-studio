@@ -252,6 +252,7 @@ export type SceneWhereInput = {
   panels?: Prisma.PanelListRelationFilter
   generatedImages?: Prisma.GeneratedImageListRelationFilter
   sceneAudios?: Prisma.SceneAudioListRelationFilter
+  shot?: Prisma.XOR<Prisma.SceneShotNullableScalarRelationFilter, Prisma.SceneShotWhereInput> | null
 }
 
 export type SceneOrderByWithRelationInput = {
@@ -268,6 +269,7 @@ export type SceneOrderByWithRelationInput = {
   panels?: Prisma.PanelOrderByRelationAggregateInput
   generatedImages?: Prisma.GeneratedImageOrderByRelationAggregateInput
   sceneAudios?: Prisma.SceneAudioOrderByRelationAggregateInput
+  shot?: Prisma.SceneShotOrderByWithRelationInput
 }
 
 export type SceneWhereUniqueInput = Prisma.AtLeast<{
@@ -287,6 +289,7 @@ export type SceneWhereUniqueInput = Prisma.AtLeast<{
   panels?: Prisma.PanelListRelationFilter
   generatedImages?: Prisma.GeneratedImageListRelationFilter
   sceneAudios?: Prisma.SceneAudioListRelationFilter
+  shot?: Prisma.XOR<Prisma.SceneShotNullableScalarRelationFilter, Prisma.SceneShotWhereInput> | null
 }, "id">
 
 export type SceneOrderByWithAggregationInput = {
@@ -334,6 +337,7 @@ export type SceneCreateInput = {
   panels?: Prisma.PanelCreateNestedManyWithoutSceneInput
   generatedImages?: Prisma.GeneratedImageCreateNestedManyWithoutSceneInput
   sceneAudios?: Prisma.SceneAudioCreateNestedManyWithoutSceneInput
+  shot?: Prisma.SceneShotCreateNestedOneWithoutSceneInput
 }
 
 export type SceneUncheckedCreateInput = {
@@ -349,6 +353,7 @@ export type SceneUncheckedCreateInput = {
   panels?: Prisma.PanelUncheckedCreateNestedManyWithoutSceneInput
   generatedImages?: Prisma.GeneratedImageUncheckedCreateNestedManyWithoutSceneInput
   sceneAudios?: Prisma.SceneAudioUncheckedCreateNestedManyWithoutSceneInput
+  shot?: Prisma.SceneShotUncheckedCreateNestedOneWithoutSceneInput
 }
 
 export type SceneUpdateInput = {
@@ -364,6 +369,7 @@ export type SceneUpdateInput = {
   panels?: Prisma.PanelUpdateManyWithoutSceneNestedInput
   generatedImages?: Prisma.GeneratedImageUpdateManyWithoutSceneNestedInput
   sceneAudios?: Prisma.SceneAudioUpdateManyWithoutSceneNestedInput
+  shot?: Prisma.SceneShotUpdateOneWithoutSceneNestedInput
 }
 
 export type SceneUncheckedUpdateInput = {
@@ -379,6 +385,7 @@ export type SceneUncheckedUpdateInput = {
   panels?: Prisma.PanelUncheckedUpdateManyWithoutSceneNestedInput
   generatedImages?: Prisma.GeneratedImageUncheckedUpdateManyWithoutSceneNestedInput
   sceneAudios?: Prisma.SceneAudioUncheckedUpdateManyWithoutSceneNestedInput
+  shot?: Prisma.SceneShotUncheckedUpdateOneWithoutSceneNestedInput
 }
 
 export type SceneCreateManyInput = {
@@ -559,6 +566,20 @@ export type SceneUpdateOneRequiredWithoutSceneAudiosNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.SceneUpdateToOneWithWhereWithoutSceneAudiosInput, Prisma.SceneUpdateWithoutSceneAudiosInput>, Prisma.SceneUncheckedUpdateWithoutSceneAudiosInput>
 }
 
+export type SceneCreateNestedOneWithoutShotInput = {
+  create?: Prisma.XOR<Prisma.SceneCreateWithoutShotInput, Prisma.SceneUncheckedCreateWithoutShotInput>
+  connectOrCreate?: Prisma.SceneCreateOrConnectWithoutShotInput
+  connect?: Prisma.SceneWhereUniqueInput
+}
+
+export type SceneUpdateOneRequiredWithoutShotNestedInput = {
+  create?: Prisma.XOR<Prisma.SceneCreateWithoutShotInput, Prisma.SceneUncheckedCreateWithoutShotInput>
+  connectOrCreate?: Prisma.SceneCreateOrConnectWithoutShotInput
+  upsert?: Prisma.SceneUpsertWithoutShotInput
+  connect?: Prisma.SceneWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.SceneUpdateToOneWithWhereWithoutShotInput, Prisma.SceneUpdateWithoutShotInput>, Prisma.SceneUncheckedUpdateWithoutShotInput>
+}
+
 export type SceneCreateWithoutProjectInput = {
   id?: string
   scene_number: number
@@ -571,6 +592,7 @@ export type SceneCreateWithoutProjectInput = {
   panels?: Prisma.PanelCreateNestedManyWithoutSceneInput
   generatedImages?: Prisma.GeneratedImageCreateNestedManyWithoutSceneInput
   sceneAudios?: Prisma.SceneAudioCreateNestedManyWithoutSceneInput
+  shot?: Prisma.SceneShotCreateNestedOneWithoutSceneInput
 }
 
 export type SceneUncheckedCreateWithoutProjectInput = {
@@ -585,6 +607,7 @@ export type SceneUncheckedCreateWithoutProjectInput = {
   panels?: Prisma.PanelUncheckedCreateNestedManyWithoutSceneInput
   generatedImages?: Prisma.GeneratedImageUncheckedCreateNestedManyWithoutSceneInput
   sceneAudios?: Prisma.SceneAudioUncheckedCreateNestedManyWithoutSceneInput
+  shot?: Prisma.SceneShotUncheckedCreateNestedOneWithoutSceneInput
 }
 
 export type SceneCreateOrConnectWithoutProjectInput = {
@@ -640,6 +663,7 @@ export type SceneCreateWithoutPanelsInput = {
   project: Prisma.ProjectCreateNestedOneWithoutScenesInput
   generatedImages?: Prisma.GeneratedImageCreateNestedManyWithoutSceneInput
   sceneAudios?: Prisma.SceneAudioCreateNestedManyWithoutSceneInput
+  shot?: Prisma.SceneShotCreateNestedOneWithoutSceneInput
 }
 
 export type SceneUncheckedCreateWithoutPanelsInput = {
@@ -654,6 +678,7 @@ export type SceneUncheckedCreateWithoutPanelsInput = {
   updated_at?: Date | string
   generatedImages?: Prisma.GeneratedImageUncheckedCreateNestedManyWithoutSceneInput
   sceneAudios?: Prisma.SceneAudioUncheckedCreateNestedManyWithoutSceneInput
+  shot?: Prisma.SceneShotUncheckedCreateNestedOneWithoutSceneInput
 }
 
 export type SceneCreateOrConnectWithoutPanelsInput = {
@@ -684,6 +709,7 @@ export type SceneUpdateWithoutPanelsInput = {
   project?: Prisma.ProjectUpdateOneRequiredWithoutScenesNestedInput
   generatedImages?: Prisma.GeneratedImageUpdateManyWithoutSceneNestedInput
   sceneAudios?: Prisma.SceneAudioUpdateManyWithoutSceneNestedInput
+  shot?: Prisma.SceneShotUpdateOneWithoutSceneNestedInput
 }
 
 export type SceneUncheckedUpdateWithoutPanelsInput = {
@@ -698,6 +724,7 @@ export type SceneUncheckedUpdateWithoutPanelsInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   generatedImages?: Prisma.GeneratedImageUncheckedUpdateManyWithoutSceneNestedInput
   sceneAudios?: Prisma.SceneAudioUncheckedUpdateManyWithoutSceneNestedInput
+  shot?: Prisma.SceneShotUncheckedUpdateOneWithoutSceneNestedInput
 }
 
 export type SceneCreateWithoutGeneratedImagesInput = {
@@ -712,6 +739,7 @@ export type SceneCreateWithoutGeneratedImagesInput = {
   project: Prisma.ProjectCreateNestedOneWithoutScenesInput
   panels?: Prisma.PanelCreateNestedManyWithoutSceneInput
   sceneAudios?: Prisma.SceneAudioCreateNestedManyWithoutSceneInput
+  shot?: Prisma.SceneShotCreateNestedOneWithoutSceneInput
 }
 
 export type SceneUncheckedCreateWithoutGeneratedImagesInput = {
@@ -726,6 +754,7 @@ export type SceneUncheckedCreateWithoutGeneratedImagesInput = {
   updated_at?: Date | string
   panels?: Prisma.PanelUncheckedCreateNestedManyWithoutSceneInput
   sceneAudios?: Prisma.SceneAudioUncheckedCreateNestedManyWithoutSceneInput
+  shot?: Prisma.SceneShotUncheckedCreateNestedOneWithoutSceneInput
 }
 
 export type SceneCreateOrConnectWithoutGeneratedImagesInput = {
@@ -756,6 +785,7 @@ export type SceneUpdateWithoutGeneratedImagesInput = {
   project?: Prisma.ProjectUpdateOneRequiredWithoutScenesNestedInput
   panels?: Prisma.PanelUpdateManyWithoutSceneNestedInput
   sceneAudios?: Prisma.SceneAudioUpdateManyWithoutSceneNestedInput
+  shot?: Prisma.SceneShotUpdateOneWithoutSceneNestedInput
 }
 
 export type SceneUncheckedUpdateWithoutGeneratedImagesInput = {
@@ -770,6 +800,7 @@ export type SceneUncheckedUpdateWithoutGeneratedImagesInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   panels?: Prisma.PanelUncheckedUpdateManyWithoutSceneNestedInput
   sceneAudios?: Prisma.SceneAudioUncheckedUpdateManyWithoutSceneNestedInput
+  shot?: Prisma.SceneShotUncheckedUpdateOneWithoutSceneNestedInput
 }
 
 export type SceneCreateWithoutSceneAudiosInput = {
@@ -784,6 +815,7 @@ export type SceneCreateWithoutSceneAudiosInput = {
   project: Prisma.ProjectCreateNestedOneWithoutScenesInput
   panels?: Prisma.PanelCreateNestedManyWithoutSceneInput
   generatedImages?: Prisma.GeneratedImageCreateNestedManyWithoutSceneInput
+  shot?: Prisma.SceneShotCreateNestedOneWithoutSceneInput
 }
 
 export type SceneUncheckedCreateWithoutSceneAudiosInput = {
@@ -798,6 +830,7 @@ export type SceneUncheckedCreateWithoutSceneAudiosInput = {
   updated_at?: Date | string
   panels?: Prisma.PanelUncheckedCreateNestedManyWithoutSceneInput
   generatedImages?: Prisma.GeneratedImageUncheckedCreateNestedManyWithoutSceneInput
+  shot?: Prisma.SceneShotUncheckedCreateNestedOneWithoutSceneInput
 }
 
 export type SceneCreateOrConnectWithoutSceneAudiosInput = {
@@ -828,6 +861,7 @@ export type SceneUpdateWithoutSceneAudiosInput = {
   project?: Prisma.ProjectUpdateOneRequiredWithoutScenesNestedInput
   panels?: Prisma.PanelUpdateManyWithoutSceneNestedInput
   generatedImages?: Prisma.GeneratedImageUpdateManyWithoutSceneNestedInput
+  shot?: Prisma.SceneShotUpdateOneWithoutSceneNestedInput
 }
 
 export type SceneUncheckedUpdateWithoutSceneAudiosInput = {
@@ -842,6 +876,83 @@ export type SceneUncheckedUpdateWithoutSceneAudiosInput = {
   updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   panels?: Prisma.PanelUncheckedUpdateManyWithoutSceneNestedInput
   generatedImages?: Prisma.GeneratedImageUncheckedUpdateManyWithoutSceneNestedInput
+  shot?: Prisma.SceneShotUncheckedUpdateOneWithoutSceneNestedInput
+}
+
+export type SceneCreateWithoutShotInput = {
+  id?: string
+  scene_number: number
+  title: string
+  narration?: string | null
+  dialogue?: string | null
+  music?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  project: Prisma.ProjectCreateNestedOneWithoutScenesInput
+  panels?: Prisma.PanelCreateNestedManyWithoutSceneInput
+  generatedImages?: Prisma.GeneratedImageCreateNestedManyWithoutSceneInput
+  sceneAudios?: Prisma.SceneAudioCreateNestedManyWithoutSceneInput
+}
+
+export type SceneUncheckedCreateWithoutShotInput = {
+  id?: string
+  project_id: string
+  scene_number: number
+  title: string
+  narration?: string | null
+  dialogue?: string | null
+  music?: string | null
+  created_at?: Date | string
+  updated_at?: Date | string
+  panels?: Prisma.PanelUncheckedCreateNestedManyWithoutSceneInput
+  generatedImages?: Prisma.GeneratedImageUncheckedCreateNestedManyWithoutSceneInput
+  sceneAudios?: Prisma.SceneAudioUncheckedCreateNestedManyWithoutSceneInput
+}
+
+export type SceneCreateOrConnectWithoutShotInput = {
+  where: Prisma.SceneWhereUniqueInput
+  create: Prisma.XOR<Prisma.SceneCreateWithoutShotInput, Prisma.SceneUncheckedCreateWithoutShotInput>
+}
+
+export type SceneUpsertWithoutShotInput = {
+  update: Prisma.XOR<Prisma.SceneUpdateWithoutShotInput, Prisma.SceneUncheckedUpdateWithoutShotInput>
+  create: Prisma.XOR<Prisma.SceneCreateWithoutShotInput, Prisma.SceneUncheckedCreateWithoutShotInput>
+  where?: Prisma.SceneWhereInput
+}
+
+export type SceneUpdateToOneWithWhereWithoutShotInput = {
+  where?: Prisma.SceneWhereInput
+  data: Prisma.XOR<Prisma.SceneUpdateWithoutShotInput, Prisma.SceneUncheckedUpdateWithoutShotInput>
+}
+
+export type SceneUpdateWithoutShotInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  scene_number?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  narration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dialogue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  music?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  project?: Prisma.ProjectUpdateOneRequiredWithoutScenesNestedInput
+  panels?: Prisma.PanelUpdateManyWithoutSceneNestedInput
+  generatedImages?: Prisma.GeneratedImageUpdateManyWithoutSceneNestedInput
+  sceneAudios?: Prisma.SceneAudioUpdateManyWithoutSceneNestedInput
+}
+
+export type SceneUncheckedUpdateWithoutShotInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  project_id?: Prisma.StringFieldUpdateOperationsInput | string
+  scene_number?: Prisma.IntFieldUpdateOperationsInput | number
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  narration?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dialogue?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  music?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  created_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updated_at?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  panels?: Prisma.PanelUncheckedUpdateManyWithoutSceneNestedInput
+  generatedImages?: Prisma.GeneratedImageUncheckedUpdateManyWithoutSceneNestedInput
+  sceneAudios?: Prisma.SceneAudioUncheckedUpdateManyWithoutSceneNestedInput
 }
 
 export type SceneCreateManyProjectInput = {
@@ -867,6 +978,7 @@ export type SceneUpdateWithoutProjectInput = {
   panels?: Prisma.PanelUpdateManyWithoutSceneNestedInput
   generatedImages?: Prisma.GeneratedImageUpdateManyWithoutSceneNestedInput
   sceneAudios?: Prisma.SceneAudioUpdateManyWithoutSceneNestedInput
+  shot?: Prisma.SceneShotUpdateOneWithoutSceneNestedInput
 }
 
 export type SceneUncheckedUpdateWithoutProjectInput = {
@@ -881,6 +993,7 @@ export type SceneUncheckedUpdateWithoutProjectInput = {
   panels?: Prisma.PanelUncheckedUpdateManyWithoutSceneNestedInput
   generatedImages?: Prisma.GeneratedImageUncheckedUpdateManyWithoutSceneNestedInput
   sceneAudios?: Prisma.SceneAudioUncheckedUpdateManyWithoutSceneNestedInput
+  shot?: Prisma.SceneShotUncheckedUpdateOneWithoutSceneNestedInput
 }
 
 export type SceneUncheckedUpdateManyWithoutProjectInput = {
@@ -957,6 +1070,7 @@ export type SceneSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   panels?: boolean | Prisma.Scene$panelsArgs<ExtArgs>
   generatedImages?: boolean | Prisma.Scene$generatedImagesArgs<ExtArgs>
   sceneAudios?: boolean | Prisma.Scene$sceneAudiosArgs<ExtArgs>
+  shot?: boolean | Prisma.Scene$shotArgs<ExtArgs>
   _count?: boolean | Prisma.SceneCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["scene"]>
 
@@ -1004,6 +1118,7 @@ export type SceneInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   panels?: boolean | Prisma.Scene$panelsArgs<ExtArgs>
   generatedImages?: boolean | Prisma.Scene$generatedImagesArgs<ExtArgs>
   sceneAudios?: boolean | Prisma.Scene$sceneAudiosArgs<ExtArgs>
+  shot?: boolean | Prisma.Scene$shotArgs<ExtArgs>
   _count?: boolean | Prisma.SceneCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type SceneIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1020,6 +1135,7 @@ export type $ScenePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     panels: Prisma.$PanelPayload<ExtArgs>[]
     generatedImages: Prisma.$GeneratedImagePayload<ExtArgs>[]
     sceneAudios: Prisma.$SceneAudioPayload<ExtArgs>[]
+    shot: Prisma.$SceneShotPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1429,6 +1545,7 @@ export interface Prisma__SceneClient<T, Null = never, ExtArgs extends runtime.Ty
   panels<T extends Prisma.Scene$panelsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scene$panelsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PanelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   generatedImages<T extends Prisma.Scene$generatedImagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scene$generatedImagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$GeneratedImagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sceneAudios<T extends Prisma.Scene$sceneAudiosArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scene$sceneAudiosArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SceneAudioPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  shot<T extends Prisma.Scene$shotArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Scene$shotArgs<ExtArgs>>): Prisma.Prisma__SceneShotClient<runtime.Types.Result.GetResult<Prisma.$SceneShotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1937,6 +2054,25 @@ export type Scene$sceneAudiosArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.SceneAudioScalarFieldEnum | Prisma.SceneAudioScalarFieldEnum[]
+}
+
+/**
+ * Scene.shot
+ */
+export type Scene$shotArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the SceneShot
+   */
+  select?: Prisma.SceneShotSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the SceneShot
+   */
+  omit?: Prisma.SceneShotOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.SceneShotInclude<ExtArgs> | null
+  where?: Prisma.SceneShotWhereInput
 }
 
 /**
