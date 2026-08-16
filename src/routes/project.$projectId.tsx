@@ -270,6 +270,16 @@ function ProjectPage() {
         <h1 className="mt-3 text-4xl sm:text-6xl">{project.title}</h1>
         <p className="mt-3 max-w-2xl text-muted-foreground">{project.logline}</p>
 
+        <div className="mt-6">
+          <Link
+            to="/studio/$projectId"
+            params={{ projectId }}
+            className="inline-block rounded-sm bg-primary px-6 py-3 font-display text-lg tracking-wider text-primary-foreground"
+          >
+            Open video studio
+          </Link>
+        </div>
+
         <div className="mt-6 flex flex-wrap gap-3 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           <span className="rounded-sm border border-border px-3 py-2">Story ✓</span>
           <span className="rounded-sm border border-border px-3 py-2">{sceneList.length} scenes</span>
