@@ -15,6 +15,7 @@ import { Route as CreateRouteImport } from './routes/create'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CharacterCharacterIdRouteImport } from './routes/character.$characterId'
 import { Route as ProjectProjectIdRouteImport } from './routes/project.$projectId'
+import { Route as StudioProjectIdRouteImport } from './routes/studio.$projectId'
 import { Route as ApiPublicFilesSplatRouteImport } from './routes/api/public/files.$'
 
 const IndexRoute = IndexRouteImport.update({
@@ -47,6 +48,11 @@ const ProjectProjectIdRoute = ProjectProjectIdRouteImport.update({
   path: '/project/$projectId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StudioProjectIdRoute = StudioProjectIdRouteImport.update({
+  id: '/studio/$projectId',
+  path: '/studio/$projectId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicFilesSplatRoute = ApiPublicFilesSplatRouteImport.update({
   id: '/api/public/files/$',
   path: '/api/public/files/$',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/character/$characterId': typeof CharacterCharacterIdRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/studio/$projectId': typeof StudioProjectIdRoute
   '/api/public/files/$': typeof ApiPublicFilesSplatRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/character/$characterId': typeof CharacterCharacterIdRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/studio/$projectId': typeof StudioProjectIdRoute
   '/api/public/files/$': typeof ApiPublicFilesSplatRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/character/$characterId': typeof CharacterCharacterIdRoute
   '/project/$projectId': typeof ProjectProjectIdRoute
+  '/studio/$projectId': typeof StudioProjectIdRoute
   '/api/public/files/$': typeof ApiPublicFilesSplatRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/character/$characterId'
     | '/project/$projectId'
+    | '/studio/$projectId'
     | '/api/public/files/$'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/character/$characterId'
     | '/project/$projectId'
+    | '/studio/$projectId'
     | '/api/public/files/$'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/character/$characterId'
     | '/project/$projectId'
+    | '/studio/$projectId'
     | '/api/public/files/$'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   CharacterCharacterIdRoute: typeof CharacterCharacterIdRoute
   ProjectProjectIdRoute: typeof ProjectProjectIdRoute
+  StudioProjectIdRoute: typeof StudioProjectIdRoute
   ApiPublicFilesSplatRoute: typeof ApiPublicFilesSplatRoute
 }
 
@@ -165,6 +178,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectProjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/studio/$projectId': {
+      id: '/studio/$projectId'
+      path: '/studio/$projectId'
+      fullPath: '/studio/$projectId'
+      preLoaderRoute: typeof StudioProjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/files/$': {
       id: '/api/public/files/$'
       path: '/api/public/files/$'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   CharacterCharacterIdRoute: CharacterCharacterIdRoute,
   ProjectProjectIdRoute: ProjectProjectIdRoute,
+  StudioProjectIdRoute: StudioProjectIdRoute,
   ApiPublicFilesSplatRoute: ApiPublicFilesSplatRoute,
 }
 export const routeTree = rootRouteImport
